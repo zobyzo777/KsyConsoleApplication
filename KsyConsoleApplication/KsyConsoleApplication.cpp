@@ -63,7 +63,7 @@ int main()
 	if (AbleBattleTypeVector.size() == 1)
 	{
 		const ECharacterType eWinType = *AbleBattleTypeVector.begin();
-		const int iReviveCount = FactoryCharacter::GetInstance().GetCharacterList(eWinType).size();
+		const int iReviveCount = FactoryCharacter::GetInstance().GetCharacterMap(eWinType).size();
 		std::cout << "========================================================================================\n";
 		printf("- 최후의 생존자는 = %s, 생존수 = %d\n", FactoryCharacter::GetInstance().EnumToString(eWinType).c_str(), iReviveCount);
 		std::cout << "========================================================================================\n";

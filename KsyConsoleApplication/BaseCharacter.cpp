@@ -106,7 +106,7 @@ void BaseCharacter::LogDeath(shared_ptr<ICharacter> InAttacker, shared_ptr<IChar
 {
 	string attackerText = FactoryCharacter::GetInstance().EnumToString(InAttacker->GetCharacterType());
 	string DefenderText = FactoryCharacter::GetInstance().EnumToString(GetCharacterType());
-	size_t iReviveCount = FactoryCharacter::GetInstance().GetCharacterList(Defender->GetCharacterType()).size();
+	size_t iReviveCount = FactoryCharacter::GetInstance().GetCharacterMap(Defender->GetCharacterType()).size();
 
 	printf("[죽음 정보] 공격자 = %s, uid = %d, 피격자 = %s, uid = %d, 남은생존자 = %zu \n", attackerText.c_str(), InAttacker->GetUID(), DefenderText.c_str(), GetUID(), iReviveCount);
 }

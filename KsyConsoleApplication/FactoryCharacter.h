@@ -1,4 +1,5 @@
 #pragma once
+#include <map>
 
 interface ICharacter;
 
@@ -26,7 +27,7 @@ public:
 	weak_ptr<ICharacter> GetRandTypeCharacter(vector<ECharacterType>& InCharacterTypeVector);
 
 	//캐릭터 타입별 리스트 반환
-	list<shared_ptr<ICharacter>>& GetCharacterList(const ECharacterType& InType);
+	map<int, shared_ptr<ICharacter>>& GetCharacterMap(const ECharacterType& InType);
 
 	//캐릭터 정보 반환
 	shared_ptr<ICharacter> GetCharacter(const ECharacterType& InType, const int InUID);
@@ -41,8 +42,8 @@ private:
 	static FactoryCharacter* instance_;
 	
 	//캐릭터 객체 스마트보인터 저장
-	list<shared_ptr<ICharacter>> LocalPlayerList;
-	list<shared_ptr<ICharacter>> LocalNpcList;
-	list<shared_ptr<ICharacter>> LocalMonsterList;
+	map<int, shared_ptr<ICharacter>> LocalPlayerMap;
+	map<int, shared_ptr<ICharacter>> LocalNpcMap;
+	map<int, shared_ptr<ICharacter>> LocalMonsterMap;
 };
 

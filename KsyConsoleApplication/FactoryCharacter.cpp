@@ -1,5 +1,6 @@
 #include "pch.h"
 #include <deque>
+#include <map>
 #include <time.h>
 #include "FactoryCharacter.h"
 #include "BaseCharacter.h"
@@ -38,34 +39,34 @@ void FactoryCharacter::FactoryDestroy()
 weak_ptr<ICharacter> FactoryCharacter::CreatePlayer(int InTID)
 {
 	shared_ptr<ICharacter> LocalPlayer(new PlayerCharacter(InTID));
-	LocalPlayerList.push_back(LocalPlayer);
+	LocalPlayerMap.insert(make_pair(LocalPlayer->GetUID(), LocalPlayer));
 	return LocalPlayer;
 }
 
 weak_ptr<ICharacter> FactoryCharacter::CreateNpc(int InTID)
 {
 	shared_ptr<ICharacter> LocalNpc(new NpcCharacter(InTID));
-	LocalNpcList.push_back(LocalNpc);
+	LocalNpcMap.insert(make_pair(LocalNpc->GetUID(), LocalNpc));
 	return LocalNpc;
 }
 
 weak_ptr<ICharacter> FactoryCharacter::CreateMonster(int InTID)
 {
 	shared_ptr<ICharacter> LocalMonster(new MonsterCharacter(InTID));
-	LocalMonsterList.push_back(LocalMonster);
+	LocalMonsterMap.insert(make_pair(LocalMonster->GetUID(), LocalMonster));
 	return LocalMonster;
 }
 
-std::list<std::shared_ptr<ICharacter>>& FactoryCharacter::GetCharacterList(const ECharacterType& InType)
+map<int, std::shared_ptr<ICharacter>>& FactoryCharacter::GetCharacterMap(const ECharacterType& InType)
 {
 	switch (InType)
 	{
 	case ECharacterType::Player:
-		return LocalPlayerList;
+		return LocalPlayerMap;
 	case ECharacterType::Npc:
-		return LocalNpcList;
+		return LocalNpcMap;
 	default:
-		return LocalMonsterList;
+		return LocalMonsterMap;
 	}
 }
 
@@ -73,19 +74,8 @@ void FactoryCharacter::SetRemoveCharacter(shared_ptr<ICharacter>& InDeathCharact
 {
 	if (InDeathCharacter)
 	{
-		list<shared_ptr<ICharacter>>& CharacterList = GetCharacterList(InDeathCharacter->GetCharacterType());
-
-		list<shared_ptr<ICharacter>>::iterator It;
-		int iIndex = 0;
-		for (It = CharacterList.begin(); It != CharacterList.end(); It++)
-		{
-			if ((*It)->GetUID() == InDeathCharacter->GetUID())
-			{
-				CharacterList.erase(It);
-				break;
-			}
-			iIndex++;
-		}
+		map<int, shared_ptr<ICharacter>>& CharacterMap = GetCharacterMap(InDeathCharacter->GetCharacterType());
+		CharacterMap.erase(InDeathCharacter->GetUID());
 	}
 }
 
@@ -110,28 +100,21 @@ std::string FactoryCharacter::EnumToString(const ECharacterType& InType)
 
 std::shared_ptr<ICharacter> FactoryCharacter::GetCharacter(const ECharacterType& InType, const int InUID)
 {
-	list<shared_ptr<ICharacter>> CharacterList = GetCharacterList(InType);
-	list<shared_ptr<ICharacter>>::iterator It;
-
-	for (It = CharacterList.begin(); It != CharacterList.end(); It++)
-	{
-		if ((*It)->GetUID() == InUID)
-			return *It;
-	}
-
-	return nullptr;
+	map<int, shared_ptr<ICharacter>> CharacterMap = GetCharacterMap(InType);
+	map<int, shared_ptr<ICharacter>>::iterator Iter = CharacterMap.find(InUID);
+	return Iter->second;
 }
 
 vector<ECharacterType> FactoryCharacter::GetAbleBattleCharacterTypeVector()
 {
 	vector<ECharacterType> CharacterTypeVector;
-	if (LocalPlayerList.size() > 0)
+	if (LocalPlayerMap.size() > 0)
 		CharacterTypeVector.push_back(ECharacterType::Player);
 
-	if (LocalNpcList.size() > 0)
+	if (LocalNpcMap.size() > 0)
 		CharacterTypeVector.push_back(ECharacterType::Npc);
 
-	if (LocalMonsterList.size() > 0)
+	if (LocalMonsterMap.size() > 0)
 		CharacterTypeVector.push_back(ECharacterType::Monster);
 
 	return CharacterTypeVector;
@@ -143,28 +126,23 @@ weak_ptr<ICharacter> FactoryCharacter::GetRandTypeCharacter(vector<ECharacterTyp
 	
 	//랜덤으로 공격자&피격자 Type 지정
 	srand((unsigned int)time(0) + ++StaticRandSeed);
-	signed int iCharacterTypeSize = InCharacterTypeVector.size();
-	signed int iRandIndex = rand() %  iCharacterTypeSize;
+	size_t iCharacterTypeSize = InCharacterTypeVector.size();
+	size_t iRandIndex = (size_t)(rand() %  iCharacterTypeSize);
 
 	if (iCharacterTypeSize > iRandIndex)
 	{
 		vector<ECharacterType>::iterator Iter = InCharacterTypeVector.begin();
 		Iter += iRandIndex;
-		list<shared_ptr<ICharacter>>& CharacterList = GetCharacterList(*Iter);		
-		iRandIndex = rand() % CharacterList.size();
+		map<int, shared_ptr<ICharacter>>& CharacterMap = GetCharacterMap(*Iter);
+		iRandIndex = rand() % CharacterMap.size();
 
 		int iIndex = 0;
-		list<shared_ptr<ICharacter>>::iterator It;		
-		for (It = CharacterList.begin(); It != CharacterList.end(); It++)
+		map<int, shared_ptr<ICharacter>>::iterator It;		
+		for (It = CharacterMap.begin(); It != CharacterMap.end(); It++)
 		{
-			if ((*It) == nullptr)
-			{
-				break;
-			}
-
 			if (iIndex == iRandIndex)
 			{
-				WeakCharacter = *It;
+				WeakCharacter = It->second;
 				break;
 			}
 			iIndex++;
