@@ -1,0 +1,9 @@
+﻿  pch.cpp
+  BaseCharacter.cpp
+  FactoryCharacter.cpp
+  KsyConsoleApplication.cpp
+  MonsterCharacter.cpp
+  NpcCharacter.cpp
+  PlayerCharacter.cpp
+  코드를 생성하고 있습니다...
+  KsyConsoleApplication.vcxproj -> D:\VSProject\KsyConsoleApplication\Debug\KsyConsoleApplication.exe
