@@ -1,17 +1,16 @@
 #include "pch.h"
+#include <deque>
+#include <time.h>
 #include "FactoryCharacter.h"
 #include "BaseCharacter.h"
 #include "PlayerCharacter.h"
 #include "NpcCharacter.h"
 #include "MonsterCharacter.h"
-#include <deque>
-#include <time.h>
 
 using namespace std;
 
 //싱글턴 인스턴스
 FactoryCharacter* FactoryCharacter::instance_ = nullptr;
-
 //Rand Seed 정보
 static unsigned StaticRandSeed = 0;
 
